@@ -1,56 +1,78 @@
 (defconst hmz-misc-packages
   ;; default behavior is to install from melpa.org
-  '(alert
-    ;; all-the-icons
+  '(
+    ;; company-posframe
+    ;; direx
+    ;; highlight-indent-guides
+    hl-block-mode
+    ;; indicators
+    ;; ivy-posframe
+    ;; psession
+    ;; undohist
+    ;; which-key-posframe
+    alert
+    all-the-icons
     amx
     bpr
-    circe
     centaur-tabs
-    ;; direx
+    circe
+    dired-sidebar
+    doom-modeline
+    doom-todo-ivy
     ember-mode
-    ;; highlight-indent-guides
-    ;; hl-block-mode
+    evil-ruby-text-objects
+    fira-code-mode
+    gcmh
+    google-this
+    hide-lines
+    hydra-posframe
     ibuffer-projectile
     ibuffer-sidebar
     indent-guide
-    ;; indicators
+    list-processes
     neotree
-    rubocopfmt
-    (sublimity :location (recipe :fetcher github :repo "zk-phi/sublimity"))
-
-    dired-sidebar
-    ;; undohist
-    ;; sublimity
-    wakatime-mode
-
-    ;; company-posframe
-    ;; ivy-posframe
-    ;; which-key-posframe
-    (hydra-posframe :location
-                    (recipe :fetcher github :repo "Ladicle/hydra-posframe"))
-
     persp-mode
     persp-mode-projectile-bridge
-    (psession :excluded t)
-    (doom-todo-ivy :location local)
-    (evil-ruby-text-objects :location local)
-    (fira-code-mode :location local)
-    (gcmh :location local)
-    (hide-lines :location local)
-    ;; (indicators :location local)
-    (list-processes+ :location local)
-    (restore-frame-position :location local)
-    (ri :location local)
-    (rspec-simple :location local)
-    (switch-buffer-functions :location local))
-    (tempbuf :location local))
+    ;; restore-frame-position
+    ri
+    rspec-simple
+    rubocopfmt
+    sublimity
+    switch-buffer-functions
+    tempbuf
+    wakatime-mode
+    yascroll
+    ))
 
-(defun hmz-init/init-hydra-posframe ()
+
+(defun hmz-misc/init-doom-modeline ()
+  (use-package doom-modeline
+    :straight t
+    ;; :if window-system
+    ;; :defer 2
+    ;; :requires all-the-icons
+    :config
+    (doom-modeline-mode 1)
+    ;; The maximum displayed length of the branch name of version control.
+    (setq doom-modeline-vcs-max-length 34)
+    (setq doom-modeline-height 18)))
+
+(defun hmz-misc/init-yascroll ()
+  (use-package yascroll
+    :straight t
+    :config
+    (global-yascroll-bar-mode 1)))
+
+(defun hmz-misc/init-google-this ()
+  (use-package google-this
+    :straight t
+    :config (google-this-mode 1)))
+
+(defun hmz-misc/init-hydra-posframe ()
  (use-package hydra-posframe
-   :straight t
-   :ensure t
+   :straight (hydra-posframe :type git :host github :repo "Ladicle/hydra-posframe")
    :requires (posframe hydra)
-   :load-path "<path-to-the-hydra-posframe>"
+   ;; :load-path "<path-to-the-hydra-posframe>"
    :hook (after-init . hydra-posframe-enable)))
 
 (defun hmz-misc/post-init-projectile-rails ()
@@ -81,17 +103,11 @@ So it safe to call it many times like in a minor mode hook."
   (straight-use-package 'circe))
 
 (defun hmz-misc/init-all-the-icons ()
-  (straight-use-package 'all-the-icons)
-  ;; (use-package all-the-icons
-  ;;   :defer 2
-  ;;   :straight (all-the-icons :type git :host github :repo "domtronn/all-the-icons.el")
-  ;;   :ensure t)
-  )
+  (straight-use-package 'all-the-icons))
 
 (defun hmz-misc/init-ibuffer-projectile ()
   (use-package ibuffer-projectile
     :straight t
-    :ensure t
     :commands (ibuffer-projectile-set-filter-groups
                ibuffer-projectile-generate-filter-groups)
     :init
@@ -110,7 +126,6 @@ So it safe to call it many times like in a minor mode hook."
   (use-package ibuffer-sidebar
     :straight t
     :load-path "~/.emacs.d/fork/ibuffer-sidebar"
-    :ensure nil
     :commands (ibuffer-sidebar-toggle-sidebar)
     :config
     (setq ibuffer-sidebar-use-custom-font t)) )
@@ -156,7 +171,6 @@ So it safe to call it many times like in a minor mode hook."
 (defun hmz-misc/init-ibuffer-sidebar ()
   (use-package ibuffer-sidebar
     ;; :load-path "~/.emacs.d/fork/ibuffer-sidebar"
-    :ensure nil
     :commands (ibuffer-sidebar-toggle-sidebar)
     :config
     (setq ibuffer-sidebar-use-custom-font t)
@@ -169,7 +183,6 @@ So it safe to call it many times like in a minor mode hook."
 (defun hmz-misc/init-dired-sidebar ()
   (use-package dired-sidebar
     :straight t
-    :ensure t
     :commands (dired-sidebar-toggle-sidebar)))
 
 (defun hmz-misc/init-centaur-tabs ()
@@ -272,7 +285,7 @@ So it safe to call it many times like in a minor mode hook."
 
 (defun hmz-misc/init-restore-frame-position ()
   (use-package restore-frame-position
-    :load-path "/Users/HMz/.spacemacs.d/layers/hmz-misc/local/restore-frame-position/restore-frame-position.el"
+    :straight (restore-frame-position :type git :host github :repo "aaronjensen/restore-frame-position")
     :config
     (restore-frame-position)))
 
@@ -282,7 +295,6 @@ So it safe to call it many times like in a minor mode hook."
     ;; :load-path  "~/spacemacs.d/layers/hmz-misc/local/tempbuf/tempbuf.el"
     :config
     ;; modified from jmjeong / jmjeong-emacs
-    (add-hook 'minibuffer-inactive-mode-hook 'turn-on-tempbuf-mode)
     (add-hook 'help-mode-hook 'turn-on-tempbuf-mode)
     (add-hook 'dired-mode-hook 'turn-on-tempbuf-mode)
     (add-hook 'custom-mode-hook 'turn-on-tempbuf-mode)
@@ -295,24 +307,24 @@ So it safe to call it many times like in a minor mode hook."
     (add-hook 'magit-mode-hook 'turn-on-tempbuf-mode)
 
     ;; tempbuf by default
-    (add-hook 'find-file-hooks 'turn-on-tempbuf-mode)
+    ;; (remove-hook 'find-file-hooks 'turn-on-tempbuf-mode)
 
     (defun hmz-misc/tempbuf-kill-func ()
        (message "%s" (buffer-name))
        (shell-command
         (combine-and-quote-strings
          (list "terminal-notifier"
-     "-message"  (buffer-name)
+     "-message" (buffer-name)
      "-title" "Tempbuf"
      ) " ")))
 
     (add-hook 'tempbuf-kill-hook 'hmz-misc/tempbuf-kill-func)
 
-    (and (fboundp 'temp-buffer-resize-mode) (temp-buffer-resize-mode t)) ; temp-buffer의 window는 작게
-    ))
+    (and (fboundp 'temp-buffer-resize-mode) (temp-buffer-resize-mode t))))
 
 (defun hmz-misc/init-rspec-simple ()
-  (use-package rspec-simple))
+  (use-package rspec-simple
+    :straight (rspec-simple :type git :host github :repo "code-mancers/rspec-simple")))
 
 (defun hmz-misc/init-amx ()
   (defun spacemacs/amx ()
@@ -349,7 +361,7 @@ So it safe to call it many times like in a minor mode hook."
 
 (defun hmz-misc/init-wakatime-mode ()
   (use-package wakatime-mode
-    :ensure t
+    :straight t
     :init
     (setq wakatime-python-path "/usr/local/bin/python3")
     :config
@@ -357,7 +369,7 @@ So it safe to call it many times like in a minor mode hook."
 
 (defun hmz-misc/init-hl-block-mode ()
   (use-package hl-block-mode
-    :ensure t
+    :straight (hl-block-mode :type git :host github :repo "emacsmirror/hl-block-mode")
     :config
     (global-hl-block-mode t)))
 
@@ -370,6 +382,7 @@ So it safe to call it many times like in a minor mode hook."
 
 (defun hmz-misc/init-indent-guide ()
   (use-package indent-guide
+    :straight t
     :if window-system
     :init
     (setq indent-guide-delay 0.8)
@@ -393,7 +406,6 @@ So it safe to call it many times like in a minor mode hook."
 (defun hmz-misc/init-highlight-indent-guides ()
   (use-package highlight-indent-guides
     :straight t
-    :ensure t
     :init
     (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
     (setq highlight-indent-guides-method 'character)))
@@ -423,7 +435,6 @@ So it safe to call it many times like in a minor mode hook."
 (defun hmz-misc/init-indicators ()
   (use-package indicators
     :straight t
-    :ensure t
     :config
     (setq ind-indicator-height 19)
     (add-hook 'after-change-major-mode-hook
@@ -803,7 +814,6 @@ So it safe to call it many times like in a minor mode hook."
 (defun hmz-misc/post-init-neotree ()
   (use-package neotree
     :straight t
-    :ensure t
     :defer t
     :requires (all-the-icons rainbow-identifiers)
     :init

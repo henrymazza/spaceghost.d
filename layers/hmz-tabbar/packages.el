@@ -12,8 +12,10 @@ which require an initialization must be listed explicitly in the list.")
   "Tabbar customizations"
   (use-package tabbar
     :straight t
-    :requires helm-lib
-    :ensure all-the-icons
+    :defer 1
+    :bind ("s-b" . tabbar-mode)
+    ;; :requires helm-lib
+    ;; :ensure all-the-icons
 
     :config
       (defun ido-switch-tab-group ()
@@ -198,9 +200,7 @@ which require an initialization must be listed explicitly in the list.")
       (set-face-attribute 'tabbar-icon-unselected nil
                           :foreground (face-attribute 'font-lock-comment-face :foreground)
                           :background 'unspecified
-                          :underline (face-attribute 'font-lock-variable-name-face :foreground)
-                          )
-      )
+                          :underline (face-attribute 'font-lock-variable-name-face :foreground)))
 
     (hmz-tabbar-refresh-faces)
 
@@ -275,8 +275,8 @@ Call `tabbar-tab-label-function' to obtain a label for TAB."
           'tabbar-tab tab
           'local-map (tabbar-make-tab-keymap tab)
           'help-echo 'tabbar-help-on-tab
-          'mouse-face 'tabbar-highlight
-          )
+          'mouse-face 'tabbar-highlight)
+
          (propertize
           (concat
            " "
@@ -417,7 +417,7 @@ element."
                      (string-lessp (nth 1 e1) (nth 1 e2))))))
         ;; If the cache has changed, update the tab sets.
         (unless (equal bl tabbar--buffers)
-          (message "cache differs")
+          (message "it differs")
           ;; Add new buffers, or update changed ones.
           (dolist (e bl) ;; loop through buffer list
             (dolist (g (nth 2 e)) ;; for each member of groups-list for current buffer
@@ -488,52 +488,16 @@ element."
                  (t "limbo"))
               "limbo")))
 
-    (defun advice-unadvice (sym)
-      "Remove all advices from symbol SYM."
-      (interactive "Function symbol: ")
-      (advice-mapc (lambda (advice _props) (advice-remove sym advice)) sym))
-
-    (defun my-make-throttler-3 ()
-      (lexical-let ((last-time (+ 10 (float-time) ))
-                    (last-args 'dummy)
-                    (last-val ()))
-        (lambda (&rest args)
-          (if (and (< 1 (- (float-time) last-time))
-                   (equal args last-args))
-              last-val
-            (setq last-time (float-time))
-            (setq last-args args)
-            (setq last-val (apply args))))))
-
-    ;; FIXME: PATCH to try to slow functions calls to
-    ;; tabbar-buffer-update-groups and tabbar-buffer-track-killed.
-    ;;
-    ;; (advice-add 'tabbar-buffer-update-groups :around (my-make-throttler-3))
-    ;; (advice-add 'tabbar-buffer-track-killed :around (my-make-throttler-3))
-    ;; (tabbar-buffer-track-killed)
-    ;; (tabbar-buffer-update-groups)
-    ;; (advice-unadvice 'tabbar-buffer-update-groups)
-    ;; (advice-unadvice 'tabbar-buffer-track-killed)
-    ;;
-    ;; NOTE: it looks this is getting lots of calls from somewhere
-    (add-hook 'kill-buffer-hook 'tabbar-buffer-track-killed)
-    (defun hmz-tabbar/debug2 ()
-      (if (string-match  "\\( *string-output*\\| *temp.*\\)" (buffer-name))
-          (message "Killed: [%s]" (buffer-name))
-
-        (message "Killed: (%s)" (buffer-name))))
-
-    (remove-hook 'kill-buffer-hook 'hmz-tabbar/debug2)
-
     (defun hmz-tabbar-refresh-tabs ()
-      (tabbar-mode 0)
-      (setq tabbar-scroll-left-button-value nil)
-      (setq tabbar-scroll-right-button-value nil)
-      (setq tabbar-home-button-value nil)
+      (if tabbar-mode
+          (progn(tabbar-mode 0)
+                (setq tabbar-scroll-left-button-value nil)
+                (setq tabbar-scroll-right-button-value nil)
+                (setq tabbar-home-button-value nil)
 
-      (hmz-tabbar-refresh-faces)
+                (hmz-tabbar-refresh-faces)
 
-      (tabbar-mode 1))
+                (tabbar-mode 1))))
 
     (unless (boundp 'after-load-theme-hook)
       (defvar after-load-theme-hook nil
@@ -546,10 +510,6 @@ element."
     (add-hook 'after-load-theme-hook 'hmz-tabbar-refresh-tabs)
     (add-hook 'after-save-hook 'hmz-tabbar-refresh-tabs)
     (add-hook 'first-change-hook 'hmz-tabbar-refresh-tabs)
-    ;; (remove-hook 'after-load-theme-hook 'hmz-tabbar-refresh-tabs)
-    ;; (remove-hook 'after-save-hook 'hmz-tabbar-refresh-tabs)
-    ;; (remove-hook 'first-change-hook 'hmz-tabbar-refresh-tabs)
-    )
 
     ;; init me!
   (tabbar-mode 1)
